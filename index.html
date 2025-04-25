@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beauty Vocabulary</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+      background: #f0f9ff;
+      color: #333;
+      max-width: 750px;
+      margin: auto;
+    }
+    h1 {
+      color: #336699;
+    }
+    .word-bank {
+      background: #e0f7fa;
+      padding: 15px;
+      border: 1px solid #ccc;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 6px;
+      width: 180px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+    .correct {
+      background-color: #c8f7c5 !important;
+    }
+    .incorrect {
+      background-color: #f7c5c5 !important;
+    }
+    .locked {
+      background-color: #ffcccc !important;
+      pointer-events: none;
+      border: 1px solid #990000;
+    }
+    button.check-btn {
+      background: #336699;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    button.check-btn:hover {
+      background: #285580;
+    }
+    .dots {
+      display: inline-block;
+      font-size: 18px;
+      vertical-align: middle;
+      margin-left: 10px;
+    }
+    .dot {
+      margin-left: 2px;
+    }
+    .dot.active {
+      color: #007bff;
+    }
+    .dot.used {
+      color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <h1>💄 Beauty Vocabulary Practice (по 3 попытки)</h1>
+
+  <div class="word-bank">
+    Word Bank: braid, stylist, mascara, ponytail, trim, bangs, foundation, shampoo, lipstick, comb
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <script>
+    const questions = [
+      "I use ___ every morning to clean my hair.",
+      "My sister tied her hair into a ___ for school.",
+      "I went to the salon for a quick ___ — just to fix the ends.",
+      "She wore red ___ to match her dress.",
+      "The ___ helped me choose a new haircut.",
+      "My friend has short ___ that fall on her forehead.",
+      "Before cutting my hair, the hairdresser used a ___.",
+      "She applied black ___ to make her eyelashes look longer.",
+      "I like to wear a French ___ when I go to work.",
+      "Use ___ before makeup to make your skin look smooth."
+    ];
+
+    const answers = [
+      "shampoo", "ponytail", "trim", "lipstick", "stylist",
+      "bangs", "comb", "mascara", "braid", "foundation"
+    ];
+
+    const maxAttempts = 3;
+    const attempts = new Array(answers.length).fill(0);
+
+    const container = document.getElementById("quizContainer");
+
+    questions.forEach((question, i) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "question";
+      qDiv.innerHTML = `
+        ${question.replace("___", `<input type="text" id="input${i}" data-index="${i}" />`)}
+        <button class="check-btn" onclick="checkAnswer(${i})">Проверить</button>
+        <span class="dots" id="dots${i}">🔵🔵🔵</span>
+      `;
+      container.appendChild(qDiv);
+    });
+
+    function updateDots(index) {
+      const dots = document.getElementById("dots" + index);
+      let dotHTML = "";
+      for (let i = 0; i < maxAttempts; i++) {
+        dotHTML += `<span class="dot ${i < attempts[index] ? 'used' : 'active'}">${i < attempts[index] ? '🔴' : '🔵'}</span>`;
+      }
+      dots.innerHTML = dotHTML;
+    }
+
+    function checkAnswer(index) {
+      const input = document.getElementById("input" + index);
+      const userAnswer = input.value.trim().toLowerCase();
+      const correct = answers[index].toLowerCase();
+
+      if (input.classList.contains("correct") || input.classList.contains("locked")) return;
+
+      if (userAnswer === correct) {
+        input.classList.remove("incorrect");
+        input.classList.add("correct");
+      } else {
+        attempts[index]++;
+        input.classList.add("incorrect");
+        updateDots(index);
+        if (attempts[index] >= maxAttempts) {
+          input.classList.add("locked");
+          input.disabled = true;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
